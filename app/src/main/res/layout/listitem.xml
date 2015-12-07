@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/todolistitem"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/todolistitemtext"
+        android:layout_height="62dp"
+        android:layout_width="fill_parent"
+        android:paddingLeft="10dp"
+        android:text="Nom tasca"
+        android:gravity="center_vertical"
+        android:textSize="25sp"
+        android:clickable="true"></TextView>
+
+</LinearLayout>
