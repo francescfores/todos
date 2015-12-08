@@ -38,12 +38,11 @@ public class MainActivity extends AppCompatActivity
 
     private Gson gson;
 
-    //public TodoArrayList tasks;
-   // private CustomListAdapter adapter;
+    public TodoArrayList tasks;
+    private CustomListAdapter adapter;
     private String taskName;
     private  int taskPriority;
     private boolean taskDone;
-    private CheckBox chkIos, chkAndroid, chkWindows;
 
     @Override
     protected void onDestroy() {
@@ -54,11 +53,19 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
+
         SharedPreferences todos = getSharedPreferences(SHARED_PREFERENCES_TODOS, 0);
         String todoList = todos.getString(TODO_LIST, null);
 
+        /* JSON EXAMPLE
 
+        [
+         {"name":"Comprar llet", "done": true, "priority": 2},
+         {"name":"Comprar pa", "done": true, "priority": 1},
+         {"name":"Fer exercici", "done": false, "priority": 3}
+         {"name":"Estudiar", "done": false, "priority": 3}
+        ]
+         */
         if (todoList == null) {
             String initial_json = "[\n" +
                     "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 2},\n" +
@@ -74,9 +81,9 @@ public class MainActivity extends AppCompatActivity
 
 
         Log.d("TAG_PROVA","*********************************************************");
-        Log.d("TAG_PROVA",todoList);
-        Log.d("TAG_PROVA","*********************************************************");
-*/
+        Log.d("TAG_PROVA", todoList);
+        Log.d("TAG_PROVA", "*********************************************************");
+
 //        Snackbar.make(,todoList , Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 //
@@ -97,7 +104,7 @@ public class MainActivity extends AppCompatActivity
                 "         {\"name\":\"Fer exercici\", \"done\": false, \"priority\": 3},\n" +
                 "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
                 "        ]" ;
-/*
+
         Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
         this.gson = new Gson();
         TodoArrayList temp = gson.fromJson(initial_json,arrayTodoList);
@@ -115,7 +122,7 @@ public class MainActivity extends AppCompatActivity
         adapter = new CustomListAdapter(this, tasks);
         todoslv.setAdapter(adapter);
 
-*/
+
 
         Toolbar toolbar = (Toolbar)
                 findViewById(R.id.toolbar);
@@ -145,6 +152,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -202,7 +210,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    /*
+
     public void showAddForm(View view) {
         taskDone = false;
         EditText taskNameText;
@@ -289,5 +297,5 @@ public class MainActivity extends AppCompatActivity
     }
     public void removeTask(){
         //TODO
-    }*/
+    }
 }
