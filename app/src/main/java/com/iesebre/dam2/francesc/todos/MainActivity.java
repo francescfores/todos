@@ -280,7 +280,16 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                taskPriority = Integer.parseInt(s.toString());
+
+                try {
+                    taskPriority = Integer.parseInt(s.toString());
+                } catch (Throwable e) {
+                    CharSequence text = "La prioritat ha de ser un numero !!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(MainActivity.this, text, duration);
+                    toast.show();
+                }
             }
 
             @Override
@@ -307,15 +316,14 @@ public class MainActivity extends AppCompatActivity
 
 
         ListView lvItems = (ListView) findViewById(R.id.todolistview);
- 
+
         for (int i = tasks.size() -1; i >= 0; i--)
         {
          RelativeLayout vwParentRow = (RelativeLayout) lvItems.getChildAt(i);
-          CheckBox btnChild = (CheckBox)vwParentRow.getChildAt(1);
+         CheckBox btnChild = (CheckBox)vwParentRow.getChildAt(1);
 
-        btnChild.setChecked(true);
-            if (tasks.get(i).isDone()) {
-                //tasks.remove(i);
+            if (tasks.get(i).isDone() && btnChild.isChecked()) {
+                tasks.remove(i);
             }
         }
 

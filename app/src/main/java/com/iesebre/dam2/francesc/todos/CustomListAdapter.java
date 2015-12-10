@@ -72,8 +72,10 @@ public class CustomListAdapter extends BaseAdapter {
 
         if(list.get(position).isDone()) {
             cBox.setVisibility(View.VISIBLE);
+            cBox.setChecked(false);
         }else{
             cBox.setVisibility(View.INVISIBLE);
+            cBox.setChecked(false);
         }
 
         return convertView;
