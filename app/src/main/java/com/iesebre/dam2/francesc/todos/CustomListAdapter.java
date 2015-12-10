@@ -1,12 +1,14 @@
 package com.iesebre.dam2.francesc.todos;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,13 +70,15 @@ public class CustomListAdapter extends BaseAdapter {
 
 
         CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
-       // cBox.setTag(Integer.valueOf(String.valueOf(list.get(position)))); // set the tag so we can identify the correct row in the listener
 
+        ImageView img = (ImageView) convertView.findViewById(R.id.task_remove_icon);
         if(list.get(position).isDone()) {
             cBox.setVisibility(View.VISIBLE);
+            img.setVisibility(View.VISIBLE);
             cBox.setChecked(false);
         }else{
             cBox.setVisibility(View.INVISIBLE);
+            img.setVisibility(View.INVISIBLE);
             cBox.setChecked(false);
         }
 
