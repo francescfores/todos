@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity
         CheckBox taskDoneText;
 
         MaterialDialog dialog = new MaterialDialog.Builder(this).
-                title("Add new Task").
+                title("Afegir nova tasca").
                 customView(R.layout.form_add_task, true).
                 negativeText("Cancel").
                 positiveText("Add").
@@ -326,10 +326,10 @@ public class MainActivity extends AppCompatActivity
                 tasks.remove(i);
             }
         }
-
         adapter.notifyDataSetChanged();
-
+    }
+    
+    public void updateTask(){
 
     }
-
 }
