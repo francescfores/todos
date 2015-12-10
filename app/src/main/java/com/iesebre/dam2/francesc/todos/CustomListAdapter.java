@@ -4,8 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -15,6 +18,11 @@ import java.util.ArrayList;
 public class CustomListAdapter extends BaseAdapter {
 
     private final Context context;
+
+    public ArrayList<TodoItem> getList() {
+        return list;
+    }
+
     private final ArrayList<TodoItem> list;
     private final LayoutInflater layoutInflater;
 
@@ -56,6 +64,17 @@ public class CustomListAdapter extends BaseAdapter {
         tv.setText(list.get(position).getName()
                 + " p: " + list.get(position).getPriority() +
                 " done: " + list.get(position).isDone());
+        CheckBox cb = (CheckBox) convertView.findViewById(R.id.task_remove);
+
+
+        CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
+       // cBox.setTag(Integer.valueOf(String.valueOf(list.get(position)))); // set the tag so we can identify the correct row in the listener
+
+        if(list.get(position).isDone()) {
+            cBox.setVisibility(View.VISIBLE);
+        }else{
+            cBox.setVisibility(View.INVISIBLE);
+        }
 
         return convertView;
     }
@@ -77,5 +96,7 @@ public class CustomListAdapter extends BaseAdapter {
 
 
     }
+
+
 
 }

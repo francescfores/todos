@@ -10,11 +10,13 @@ public class TodoItem {
     private String name;
     private boolean done;
     private int priority;
+    boolean checkbox;
 
     public TodoItem() {
         this.name = "";
         this.done = false;
         this.priority = 1;
+        this.checkbox = false;
     }
 
     public TodoItem(String name, boolean done, int priority) {
@@ -57,5 +59,13 @@ public class TodoItem {
     public String serialize(){
         Gson gson = new Gson();
         return gson.toJson(this);
+    }
+
+    public boolean isCheckbox() {
+        return checkbox;
+    }
+
+    public void setCheckbox(boolean checkbox) {
+        this.checkbox = checkbox;
     }
 }
