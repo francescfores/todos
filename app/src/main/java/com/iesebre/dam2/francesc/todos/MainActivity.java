@@ -228,8 +228,8 @@ public class MainActivity extends AppCompatActivity
         MaterialDialog dialog = new MaterialDialog.Builder(this).
                 title("Afegir nova tasca").
                 customView(R.layout.form_add_task, true).
-                negativeText("Cancel").
-                positiveText("Add").
+                negativeText("Cancel·la").
+                positiveText("Acepta").
                 negativeColor(Color.parseColor("#ff3333")).
                 positiveColor(Color.parseColor("#2196F3")).
                 onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -286,7 +286,6 @@ public class MainActivity extends AppCompatActivity
                 } catch (Throwable e) {
                     CharSequence text = "La prioritat ha de ser un numero !!";
                     int duration = Toast.LENGTH_SHORT;
-
                     Toast toast = Toast.makeText(MainActivity.this, text, duration);
                     toast.show();
                 }
@@ -329,7 +328,107 @@ public class MainActivity extends AppCompatActivity
         adapter.notifyDataSetChanged();
     }
     
-    public void updateTask(){
+    public void updateTask(View view){
+        CharSequence text = "La prioritat ha de ser un numero !!";
+        int duration = Toast.LENGTH_SHORT;
 
+        Toast toast = Toast.makeText(MainActivity.this, text, duration);
+        toast.show();
+
+
+        taskDone = false;
+        EditText taskNameText;
+        EditText taskPriorityText;
+        CheckBox taskDoneText;
+
+        ListView lvItems = (ListView) findViewById(R.id.addtaskdialog);
+        LinearLayout vwParentRow = (LinearLayout) lvItems.getChildAt(0);
+        EditText btnChild = (EditText)vwParentRow.getChildAt(0);
+        btnChild.setHint("eee");
+
+        MaterialDialog dialog = new MaterialDialog.Builder(this).
+                title("Editar tasca").
+                customView(R.layout.form_add_task, true).
+                negativeText("Cancel·la").
+                positiveText("Acepta").
+                negativeColor(Color.parseColor("#ff3333")).
+                positiveColor(Color.parseColor("#2196F3")).
+                onPositive(new MaterialDialog.SingleButtonCallback() {
+
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        final TodoItem todoItem = new TodoItem();
+                        todoItem.setName(taskName);
+                        todoItem.setPriority(taskPriority);
+                        todoItem.setDone(taskDone);
+
+                        tasks.add(todoItem);
+                        //tasks.remove(1);
+                        adapter.notifyDataSetChanged();
+                    }
+                }).
+                build();
+        dialog.show();
+
+        taskNameText = (EditText) dialog.getCustomView().findViewById(R.id.task_tittle);
+        taskNameText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                taskName = s.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        taskPriorityText = (EditText) dialog.getCustomView().findViewById(R.id.task_Priority);
+        taskPriorityText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                try {
+                    taskPriority = Integer.parseInt(s.toString());
+                } catch (Throwable e) {
+                    CharSequence text = "La prioritat ha de ser un numero !!";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(MainActivity.this, text, duration);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        taskDoneText = (CheckBox) dialog.getCustomView().findViewById(R.id.task_Done);
+        taskDoneText.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    taskDone = true;
+                } else {
+                    taskDone = false;
+                }
+            }
+        });
     }
 }

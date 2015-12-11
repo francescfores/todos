@@ -4,7 +4,9 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:weightSum="1"
-    android:paddingTop="10dp">
+    android:paddingTop="10dp"
+
+    >
 
     <TextView
         android:id="@+id/todolistitemtext"
@@ -13,9 +15,10 @@
         android:paddingLeft="10dp"
         android:text="Nom tasca"
         android:textSize="16sp"
-        android:clickable="true"
         android:orientation="vertical"
-        android:layout_alignParentLeft="true"></TextView>
+        android:layout_alignParentLeft="true"
+        android:onClick="updateTask"
+        ></TextView>
 
     <CheckBox android:id="@+id/task_remove"
         android:layout_width="wrap_content"
