@@ -341,10 +341,7 @@ public class MainActivity extends AppCompatActivity
         EditText taskPriorityText;
         CheckBox taskDoneText;
 
-        ListView lvItems = (ListView) findViewById(R.id.addtaskdialog);
-        LinearLayout vwParentRow = (LinearLayout) lvItems.getChildAt(0);
-        EditText btnChild = (EditText)vwParentRow.getChildAt(0);
-        btnChild.setHint("eee");
+
 
         MaterialDialog dialog = new MaterialDialog.Builder(this).
                 title("Editar tasca").

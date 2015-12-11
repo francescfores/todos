@@ -72,6 +72,11 @@ public class CustomListAdapter extends BaseAdapter {
         CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
 
         ImageView img = (ImageView) convertView.findViewById(R.id.task_remove_icon);
+
+        cBox.setVisibility(View.VISIBLE);
+        img.setVisibility(View.VISIBLE);
+
+       /*
         if(list.get(position).isDone()) {
             cBox.setVisibility(View.VISIBLE);
             img.setVisibility(View.VISIBLE);
@@ -81,7 +86,7 @@ public class CustomListAdapter extends BaseAdapter {
             img.setVisibility(View.INVISIBLE);
             cBox.setChecked(false);
         }
-
+        */
         return convertView;
     }
     public  void onClick(int position, View convertView, ViewGroup parent) {
