@@ -3,6 +3,7 @@ package com.iesebre.dam2.francesc.todos;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,7 +27,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.ArrayList;
 
 /**
- * Created by sergi on 20/11/15.
+ * Created by francesc on 20/11/15.
  */
 public class CustomListAdapter extends BaseAdapter {
 
@@ -79,10 +80,22 @@ public class CustomListAdapter extends BaseAdapter {
 
         CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
 
-        ImageView img = (ImageView) convertView.findViewById(R.id.task_remove_icon);
+       // ImageView img = (ImageView) convertView.findViewById(R.id.task_remove_icon);
 
         cBox.setVisibility(View.VISIBLE);
-        img.setVisibility(View.VISIBLE);
+        cBox.setChecked(false);
+
+       // img.setVisibility(View.VISIBLE);
+        ImageView img2 = (ImageView) convertView.findViewById(R.id.task_remove_icon1);
+        if(list.get(position).getPriority()==1){
+            img2.setImageResource(R.drawable.low);
+        }
+        if(list.get(position).getPriority()==2){
+            img2.setImageResource(R.drawable.medium);
+        }
+        if(list.get(position).getPriority()==3){
+            img2.setImageResource(R.drawable.high);
+        }
 
        /*
         if(list.get(position).isDone()) {
@@ -102,10 +115,9 @@ public class CustomListAdapter extends BaseAdapter {
             @Override
             public void onClick(final View v) {
 
-
-
                 EditText taskNameText;
-
+                EditText taskPriorityText;
+                CheckBox taskDoneText;
 
                 MaterialDialog dialog = new MaterialDialog.Builder((Activity) v.getContext()).
                         title("Editar tasca").
@@ -147,17 +159,53 @@ public class CustomListAdapter extends BaseAdapter {
 
                     }
                 });
+                taskPriorityText = (EditText) dialog.getCustomView().findViewById(R.id.task_Priority);
+                taskPriorityText.addTextChangedListener(new TextWatcher() {
 
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        try {
+                            list.get(position).setPriority(Integer.parseInt(s.toString()));
+                        } catch (Throwable e) {
+                            CharSequence text = "La prioritat ha de ser un numero !!";
+                            int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText((Activity) v.getContext(), text, duration);
+                            toast.show();
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+                taskDoneText = (CheckBox) dialog.getCustomView().findViewById(R.id.task_Done);
+                taskDoneText.setChecked(false);
+                list.get(position).setDone(false);
+                taskDoneText.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            list.get(position).setDone(true);
+                        } else {
+                            list.get(position).setDone(false);
+                        }
+                    }
+                });
 
 
             }
 
 
         });
-
-
-
-
         return convertView;
     }
     public void onClick(int position, View convertView, ViewGroup parent) {

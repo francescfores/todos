@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity
         String initial_json = "[\n" +
                 "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 2},\n" +
                 "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
+                "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
                 "         {\"name\":\"Fer exercici\", \"done\": false, \"priority\": 3},\n" +
                 "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
                 "        ]" ;
@@ -319,7 +320,7 @@ public class MainActivity extends AppCompatActivity
         for (int i = tasks.size() -1; i >= 0; i--)
         {
          RelativeLayout vwParentRow = (RelativeLayout) lvItems.getChildAt(i);
-         CheckBox btnChild = (CheckBox)vwParentRow.getChildAt(1);
+         CheckBox btnChild = (CheckBox)vwParentRow.getChildAt(2);
 
             if (tasks.get(i).isDone() && btnChild.isChecked()) {
                 tasks.remove(i);

@@ -3,7 +3,7 @@ package com.iesebre.dam2.francesc.todos;
 import com.google.gson.Gson;
 
 /**
- * Created by sergi on 13/11/15.
+ * Created by francesc on 13/11/15.
  */
 public class TodoItem {
 
