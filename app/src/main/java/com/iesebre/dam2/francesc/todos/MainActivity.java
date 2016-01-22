@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +36,9 @@ import android.widget.ListView;
 import android.widget.AdapterView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
@@ -47,26 +53,46 @@ import android.widget.Toast;
 import java.lang.reflect.Type;
 
 public class MainActivity extends AppCompatActivity
-    implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SHARED_PREFERENCES_TODOS = "SP_TODOS";
     private static final String TODO_LIST = "todo_list";
 
-    private String todoList="";
+    private String todoList = "";
     private Gson gson;
     public TodoArrayList tasks;
     private CustomListAdapter adapter;
     private String taskName;
-    private  int taskPriority;
+    private int taskPriority;
     private boolean taskDone;
     private SwipeRefreshLayout swipeContainer;
+    private static final String DEBUG_TAG = "NetworkStatusExample";
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
     protected void onStop() {
         super.onStop();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.iesebre.dam2.francesc.todos/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
         //Serialitzem TaskArrayList a JSON
-        Type taskArrayListType = new TypeToken<TodoArrayList>(){}.getType();
+        Type taskArrayListType = new TypeToken<TodoArrayList>() {
+        }.getType();
         String serializedData = gson.toJson(tasks, taskArrayListType);
 
         System.out.println("Saving: " + serializedData);
@@ -76,7 +102,11 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences.Editor editor = preferencesReader.edit();
         editor.putString(TODO_LIST, serializedData);
         editor.apply();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.disconnect();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -89,13 +119,14 @@ public class MainActivity extends AppCompatActivity
 
         getSharedPreferencesTodolist();
 
+
         //Executa el code Ion que obté el Json i el guarda en un camp/field de l'objecte activity
         PullToRefresh();
 
         //TestAsyncTask testAsyncTask = new TestAsyncTask(MainActivity.this, "http://tasksapi.app/task/10");
         //testAsyncTask.execute();
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -109,15 +140,33 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    private void getSharedPreferencesTodolist(){
+    public static boolean checkWifi(Context context) {
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        boolean isWifiConn = networkInfo.isConnected();
+        return isWifiConn;
+    }
+
+    public static boolean checkMobile(Context context) {
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        //String type = networkInfo.getSubtypeName();
+        boolean isMobileConn = networkInfo.isConnected();
+        return isMobileConn;
+    }
+
+    private void getSharedPreferencesTodolist() {
         SharedPreferences todos = getSharedPreferences(SHARED_PREFERENCES_TODOS, 0);
         String todoList = todos.getString(TODO_LIST, null);
-        Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
+        Type arrayTodoList = new TypeToken<TodoArrayList>() {
+        }.getType();
         this.gson = new Gson();
-        TodoArrayList temp = gson.fromJson(todoList,arrayTodoList);
+        TodoArrayList temp = gson.fromJson(todoList, arrayTodoList);
 
         if (temp != null) {
             tasks = temp;
@@ -125,15 +174,14 @@ public class MainActivity extends AppCompatActivity
             //Error TODO
         }
 
-        ListView todoslv =
-                (ListView) findViewById(R.id.todolistview);
+        ListView todoslv = (ListView) findViewById(R.id.todolistview);
 
         //We bind our arraylist of tasks to the adapter
         adapter = new CustomListAdapter(this, tasks);
         todoslv.setAdapter(adapter);
     }
 
-    private void PullToRefresh(){
+    private void PullToRefresh() {
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -154,28 +202,64 @@ public class MainActivity extends AppCompatActivity
 
     //Carregar el JSON d'una pàgina remota utilitzant ion
     private void fetchDownloadJson() {
-        Ion.with(this)
-                .load("http://acacha.github.io/json-server-todos/db_todos.json")
-                .asJsonArray()
-                //Procés asíncron
-                .setCallback(new FutureCallback<JsonArray>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonArray result) {
-                        //Guardem la resposta de la consulta
-                        todoList = result.toString();
-                        //Actualitzem la llista
-
-                        updateTodosList();
-                        Toast toast = Toast.makeText(MainActivity.this, "Descarrega completada!!", Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
+        if (!checkWifi(MainActivity.this) && !checkMobile(MainActivity.this)) {
+            Toast.makeText(getBaseContext(), "Necesaria conexión a internet ", Toast.LENGTH_SHORT).show();
+            swipeContainer.setRefreshing(false);
+        } else if (checkMobile(MainActivity.this)) {
+            Toast.makeText(getBaseContext(), "Connexió amb dades mòbils, desitges descarregar la llista ?", Toast.LENGTH_SHORT).show();
+            MaterialDialog dialog = new MaterialDialog.Builder(this).
+                    title("Connexió amb dades mòbils, desitges descarregar la llista ?").
+                    negativeText("Cancel·la").
+                    positiveText("Acepta").
+                    negativeColor(Color.parseColor("#ff3333")).
+                    positiveColor(Color.parseColor("#2196F3")).
+                    onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            Ion.with(MainActivity.this)
+                                    .load("http://acacha.github.io/json-server-todos/db_todos.json")
+                                    .asJsonArray()
+                                            //Procés asíncron
+                                    .setCallback(new FutureCallback<JsonArray>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonArray result) {
+                                            //Guardem la resposta de la consulta
+                                            todoList = result.toString();
+                                            //Actualitzem la llista
+                                            updateTodosList();
+                                            Toast toast = Toast.makeText(MainActivity.this, "Descarrega completada!!", Toast.LENGTH_SHORT);
+                                            toast.show();
+                                        }
+                                    });
+                        }
+                    }).
+                    build();
+            dialog.show();
+        } else {
+            Ion.with(this)
+                    .load("http://acacha.github.io/json-server-todos/db_todos.json")
+                    .asJsonArray()
+                            //Procés asíncron
+                    .setCallback(new FutureCallback<JsonArray>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonArray result) {
+                            //Guardem la resposta de la consulta
+                            todoList = result.toString();
+                            //Actualitzem la llista
+                            updateTodosList();
+                            Toast toast = Toast.makeText(MainActivity.this, "Descarrega completada!!", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+        }
     }
+
     //Recarregar el JSON al fer un Pull-to-refresh
     private void updateTodosList() {
-        Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
+        Type arrayTodoList = new TypeToken<TodoArrayList>() {
+        }.getType();
         this.gson = new Gson();
-        TodoArrayList temp = gson.fromJson(todoList,arrayTodoList);
+        TodoArrayList temp = gson.fromJson(todoList, arrayTodoList);
         tasks = temp;
 
         ListView todoslv = (ListView) findViewById(R.id.todolistview);
@@ -186,6 +270,7 @@ public class MainActivity extends AppCompatActivity
         //Aturem el pull to refresh
         swipeContainer.setRefreshing(false);
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -338,15 +423,14 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    public void removeTask(View view){
+    public void removeTask(View view) {
 
 
         ListView lvItems = (ListView) findViewById(R.id.todolistview);
 
-        for (int i = tasks.size() -1; i >= 0; i--)
-        {
-         RelativeLayout vwParentRow = (RelativeLayout) lvItems.getChildAt(i);
-         CheckBox btnChild = (CheckBox)vwParentRow.getChildAt(2);
+        for (int i = tasks.size() - 1; i >= 0; i--) {
+            RelativeLayout vwParentRow = (RelativeLayout) lvItems.getChildAt(i);
+            CheckBox btnChild = (CheckBox) vwParentRow.getChildAt(2);
 
             if (tasks.get(i).isDone() && btnChild.isChecked()) {
                 tasks.remove(i);
@@ -355,9 +439,29 @@ public class MainActivity extends AppCompatActivity
         adapter.notifyDataSetChanged();
 
     }
-    
+
     public void updateTask(View view) {
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.iesebre.dam2.francesc.todos/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     public static class Utility {
