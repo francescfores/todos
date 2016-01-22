@@ -65,13 +65,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        //Serialize our TaskArrayList to Json
+        //Serialitzem TaskArrayList a JSON
         Type taskArrayListType = new TypeToken<TodoArrayList>(){}.getType();
         String serializedData = gson.toJson(tasks, taskArrayListType);
 
         System.out.println("Saving: " + serializedData);
 
-        //Save tasks in SharedPreferences
+        //Guardem les tasques a SharedPreferences
         SharedPreferences preferencesReader = getSharedPreferences(SHARED_PREFERENCES_TODOS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferencesReader.edit();
         editor.putString(TODO_LIST, serializedData);
@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity
                         //Guardem la resposta de la consulta
                         todoList = result.toString();
                         //Actualitzem la llista
+
                         updateTodosList();
                         Toast toast = Toast.makeText(MainActivity.this, "Descarrega completada!!", Toast.LENGTH_SHORT);
                         toast.show();
