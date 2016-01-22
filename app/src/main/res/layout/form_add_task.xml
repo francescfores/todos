@@ -30,6 +30,7 @@
     <CheckBox android:id="@+id/task_Done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Estat de la tasca"
         />
 

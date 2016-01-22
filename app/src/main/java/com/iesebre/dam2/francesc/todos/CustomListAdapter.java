@@ -69,24 +69,15 @@ public class CustomListAdapter extends BaseAdapter {
         } else {
 
         }
-
         TextView tv  = (TextView) convertView.findViewById(R.id.todolistitemtext);
-
-
-        tv.setText(list.get(position).getName()+ " p: " + list.get(position).getPriority() + " done: " + list.get(position).isDone());
-
-        CheckBox cb = (CheckBox) convertView.findViewById(R.id.task_remove);
-
-
+        tv.setText(list.get(position).getName() + " p: " + list.get(position).getPriority() + " done: " + list.get(position).isDone());
         CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
-
-       // ImageView img = (ImageView) convertView.findViewById(R.id.task_remove_icon);
 
         cBox.setVisibility(View.VISIBLE);
         cBox.setChecked(false);
 
-       // img.setVisibility(View.VISIBLE);
-        ImageView img2 = (ImageView) convertView.findViewById(R.id.task_remove_icon1);
+
+        ImageView img2 = (ImageView) convertView.findViewById(R.id.priority);
         if(list.get(position).getPriority()==1){
             img2.setImageResource(R.drawable.low);
         }
@@ -97,21 +88,9 @@ public class CustomListAdapter extends BaseAdapter {
             img2.setImageResource(R.drawable.high);
         }
 
-       /*
-        if(list.get(position).isDone()) {
-            cBox.setVisibility(View.VISIBLE);
-            img.setVisibility(View.VISIBLE);
-            cBox.setChecked(false);
-        }else{
-            cBox.setVisibility(View.INVISIBLE);
-            img.setVisibility(View.INVISIBLE);
-            cBox.setChecked(false);
-        }
-        */
-
-        tv.setTag(position); //For passing the list item index
-        tv.setOnClickListener(new View.OnClickListener() {
-
+        tv.setTag(position);
+        tv.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(final View v) {
 
@@ -208,23 +187,7 @@ public class CustomListAdapter extends BaseAdapter {
         });
         return convertView;
     }
-    public void onClick(int position, View convertView, ViewGroup parent) {
 
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(
-                    R.layout.listitem,
-                    null);
-        } else {
-
-        }
-
-        TextView tv  = (TextView) convertView.findViewById(R.id.todolistitemtext);
-
-
-        tv.setText(list.get(position).getName()
-                + " p: " + list.get(position).getPriority() +
-                " done: " + list.get(position).isDone());
-    }
 
 
 

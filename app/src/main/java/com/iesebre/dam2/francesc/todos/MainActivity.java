@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,17 +22,23 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
 import android.view.ActionMode;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -44,13 +52,18 @@ public class MainActivity extends AppCompatActivity
     private static final String SHARED_PREFERENCES_TODOS = "SP_TODOS";
     private static final String TODO_LIST = "todo_list";
 
+    private String todoList="";
     private Gson gson;
-
     public TodoArrayList tasks;
     private CustomListAdapter adapter;
     private String taskName;
     private  int taskPriority;
     private boolean taskDone;
+    private SwipeRefreshLayout swipeContainer;
+
+
+
+
 
     @Override
     protected void onDestroy() {
@@ -61,63 +74,21 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         SharedPreferences todos = getSharedPreferences(SHARED_PREFERENCES_TODOS, 0);
         String todoList = todos.getString(TODO_LIST, null);
 
-        /* JSON EXAMPLE
-
-        [
-         {"name":"Comprar llet", "done": true, "priority": 2},
-         {"name":"Comprar pa", "done": true, "priority": 1},
-         {"name":"Fer exercici", "done": false, "priority": 3}
-         {"name":"Estudiar", "done": false, "priority": 3}
-        ]
-         */
-        if (todoList == null) {
-            String initial_json = "[\n" +
-                    "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 2},\n" +
-                    "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
-                    "         {\"name\":\"Fer exercici\", \"done\": false, \"priority\": 3},\n" +
-                    "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
-                    "        ]" ;
-            SharedPreferences.Editor editor = todos.edit();
-            editor.putString(TODO_LIST,initial_json);
-            editor.commit();
-            todoList = todos.getString(TODO_LIST, null);
-        }
-
-
-        Log.d("TAG_PROVA","*********************************************************");
-        Log.d("TAG_PROVA", todoList);
-        Log.d("TAG_PROVA", "*********************************************************");
-
-//        Snackbar.make(,todoList , Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//
-//        Toast.makeText(this, todoList, Toast.LENGTH_LONG).show();
-
-        /* JSON EXAMPLE
-
-        [
-         {"name":"Comprar llet", "done": true, "priority": 2},
-         {"name":"Comprar pa", "done": true, "priority": 1},
-         {"name":"Fer exercisi", "done": false, "priority": 3}
-        ]
-         */
 
         String initial_json = "[\n" +
-                "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 2},\n" +
-                "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
-                "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
-                "         {\"name\":\"Fer exercici\", \"done\": false, \"priority\": 3},\n" +
+                "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 1},\n" +
+                "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 2},\n" +
                 "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
                 "        ]" ;
 
         Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
         this.gson = new Gson();
         TodoArrayList temp = gson.fromJson(initial_json,arrayTodoList);
-
+        TestAsyncTask testAsyncTask = new TestAsyncTask(MainActivity.this, "http://tasksapi.app/task/10");
+        testAsyncTask.execute();
         if (temp != null) {
             tasks = temp;
         } else {
@@ -125,32 +96,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         ListView todoslv = (ListView) findViewById(R.id.todolistview);
-
-        //We bind our arraylist of tasks to the adapter
         adapter = new CustomListAdapter(this, tasks);
         todoslv.setAdapter(adapter);
+        Utility.setListViewHeightBasedOnChildren(todoslv);
 
 
-
-
-        Toolbar toolbar = (Toolbar)
-                findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         FloatingActionButton fabRemove = (FloatingActionButton) findViewById(R.id.fab_remove);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                //Intent intent = new Intent(MainActivity.this, Main2Activity.class );
-//                //startActivity(intent);
-//                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                  //      .setAction("Action", null).show();
-//            }
-//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -160,9 +117,42 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                fetchDownloadJson();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+
     }
 
-
+    private void fetchDownloadJson() {
+        Ion.with(this)
+                .load("http://acacha.github.io/json-server-todos/db_todos.json")
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonArray result) {
+                        todoList = result.toString();
+                        updateTodoslv();
+                    }
+                });
+    }
+    private void updateTodoslv() {
+        swipeContainer.setRefreshing(false);
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -241,10 +231,12 @@ public class MainActivity extends AppCompatActivity
                         todoItem.setName(taskName);
                         todoItem.setPriority(taskPriority);
                         todoItem.setDone(taskDone);
-
                         tasks.add(todoItem);
                         //tasks.remove(1);
                         adapter.notifyDataSetChanged();
+                        ListView todoslv = (ListView) findViewById(R.id.todolistview);
+                        Utility.setListViewHeightBasedOnChildren(todoslv);
+
                     }
                 }).
 
@@ -327,9 +319,31 @@ public class MainActivity extends AppCompatActivity
             }
         }
         adapter.notifyDataSetChanged();
+
     }
     
     public void updateTask(View view) {
 
     }
+    public static class Utility {
+        public static void setListViewHeightBasedOnChildren(ListView listView) {
+            ListAdapter listAdapter = listView.getAdapter();
+            if (listAdapter == null) {
+                // pre-condition
+                return;
+            }
+
+            int totalHeight = 0;
+            for (int i = 0; i < listAdapter.getCount(); i++) {
+                View listItem = listAdapter.getView(i, null, listView);
+                listItem.measure(0, 0);
+                totalHeight += listItem.getMeasuredHeight();
+            }
+
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+            listView.setLayoutParams(params);
+        }
+    }
+
 }

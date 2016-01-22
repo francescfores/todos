@@ -9,5 +9,12 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main2"
     tools:context="com.iesebre.dam2.francesc.todos.Main2Activity">
-
+    <ListView
+        android:id="@+id/todolistview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:dividerHeight="5dp" />
 </RelativeLayout>
