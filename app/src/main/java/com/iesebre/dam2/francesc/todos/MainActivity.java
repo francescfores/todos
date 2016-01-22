@@ -62,9 +62,21 @@ public class MainActivity extends AppCompatActivity
     private SwipeRefreshLayout swipeContainer;
 
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //Serialize our TaskArrayList to Json
+        Type taskArrayListType = new TypeToken<TodoArrayList>(){}.getType();
+        String serializedData = gson.toJson(tasks, taskArrayListType);
 
+        System.out.println("Saving: " + serializedData);
 
-
+        //Save tasks in SharedPreferences
+        SharedPreferences preferencesReader = getSharedPreferences(SHARED_PREFERENCES_TODOS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferencesReader.edit();
+        editor.putString(TODO_LIST, serializedData);
+        editor.apply();
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -75,49 +87,16 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                fetchDownloadJson();
-            }
-        });
-        // Configure the refreshing colors
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        getSharedPreferencesTodolist();
 
-        SharedPreferences todos = getSharedPreferences(SHARED_PREFERENCES_TODOS, 0);
-        String todoList = todos.getString(TODO_LIST, null);
-
-
-        if (todoList == null) {
-            String initial_json = "[\n" +
-                    "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 2},\n" +
-                    "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
-                    "         {\"name\":\"Fer exercici\", \"done\": false, \"priority\": 3},\n" +
-                    "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
-                    "        ]" ;
-            SharedPreferences.Editor editor = todos.edit();
-            editor.putString(TODO_LIST,initial_json);
-            editor.commit();
-            todoList = todos.getString(TODO_LIST, null);
-        }
-
+        //Executa el code Ion que obté el Json i el guarda en un camp/field de l'objecte activity
+        PullToRefresh();
 
         //TestAsyncTask testAsyncTask = new TestAsyncTask(MainActivity.this, "http://tasksapi.app/task/10");
         //testAsyncTask.execute();
 
-
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         FloatingActionButton fabRemove = (FloatingActionButton) findViewById(R.id.fab_remove);
@@ -133,19 +112,9 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void fetchDownloadJson() {
-        Ion.with(this)
-                .load("http://acacha.github.io/json-server-todos/db_todos.json")
-                .asJsonArray()
-                .setCallback(new FutureCallback<JsonArray>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonArray result) {
-                        todoList = result.toString();
-                        updateTodosList();
-                    }
-                });
-    }
-    private void updateTodosList() {
+    private void getSharedPreferencesTodolist(){
+        SharedPreferences todos = getSharedPreferences(SHARED_PREFERENCES_TODOS, 0);
+        String todoList = todos.getString(TODO_LIST, null);
         Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
         this.gson = new Gson();
         TodoArrayList temp = gson.fromJson(todoList,arrayTodoList);
@@ -162,9 +131,59 @@ public class MainActivity extends AppCompatActivity
         //We bind our arraylist of tasks to the adapter
         adapter = new CustomListAdapter(this, tasks);
         todoslv.setAdapter(adapter);
+    }
 
+    private void PullToRefresh(){
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                fetchDownloadJson();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+    }
+
+    //Carregar el JSON d'una pàgina remota utilitzant ion
+    private void fetchDownloadJson() {
+        Ion.with(this)
+                .load("http://acacha.github.io/json-server-todos/db_todos.json")
+                .asJsonArray()
+                //Procés asíncron
+                .setCallback(new FutureCallback<JsonArray>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonArray result) {
+                        //Guardem la resposta de la consulta
+                        todoList = result.toString();
+                        //Actualitzem la llista
+                        updateTodosList();
+                        Toast toast = Toast.makeText(MainActivity.this, "Descarrega completada!!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
+    }
+    //Recarregar el JSON al fer un Pull-to-refresh
+    private void updateTodosList() {
+        Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
+        this.gson = new Gson();
+        TodoArrayList temp = gson.fromJson(todoList,arrayTodoList);
+        tasks = temp;
+
+        ListView todoslv = (ListView) findViewById(R.id.todolistview);
+
+        //Setejem l'arry de taskes al adapter
+        adapter = new CustomListAdapter(this, tasks);
+        todoslv.setAdapter(adapter);
+        //Aturem el pull to refresh
         swipeContainer.setRefreshing(false);
-
     }
     @Override
     public void onBackPressed() {
@@ -317,6 +336,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
     public void removeTask(View view){
 
 
@@ -338,6 +358,7 @@ public class MainActivity extends AppCompatActivity
     public void updateTask(View view) {
 
     }
+
     public static class Utility {
         public static void setListViewHeightBasedOnChildren(ListView listView) {
             ListAdapter listAdapter = listView.getAdapter();
