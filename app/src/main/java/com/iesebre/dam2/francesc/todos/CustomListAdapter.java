@@ -2,6 +2,7 @@ package com.iesebre.dam2.francesc.todos;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
@@ -18,6 +19,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,26 +72,30 @@ public class CustomListAdapter extends BaseAdapter {
 
         }
         TextView tv  = (TextView) convertView.findViewById(R.id.todolistitemtext);
-        tv.setText(list.get(position).getName() + " p: " + list.get(position).getPriority() + " done: " + list.get(position).isDone());
+        tv.setText(list.get(position).getName()/* + " p: " + list.get(position).getPriority() + " done: " + list.get(position).isDone()*/);
         CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
 
         cBox.setVisibility(View.VISIBLE);
         cBox.setChecked(false);
 
+        tv.setTag(position);
 
-        ImageView img2 = (ImageView) convertView.findViewById(R.id.priority);
         if(list.get(position).getPriority()==1){
-            img2.setImageResource(R.drawable.low);
+            cBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#26A69A")));
         }
         if(list.get(position).getPriority()==2){
-            img2.setImageResource(R.drawable.medium);
+            cBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#FFE0B2")));
         }
         if(list.get(position).getPriority()==3){
-            img2.setImageResource(R.drawable.high);
+            cBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
         }
 
-        tv.setTag(position);
-        tv.setOnClickListener(new View.OnClickListener()
+        if(list.get(position).isDone()){
+            cBox.setChecked(true);
+        }
+
+        RelativeLayout addtaskdialog = (RelativeLayout) convertView.findViewById(R.id.addtaskdialog);
+        addtaskdialog.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(final View v) {

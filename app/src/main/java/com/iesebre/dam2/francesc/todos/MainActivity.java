@@ -205,8 +205,33 @@ public class MainActivity extends AppCompatActivity
         if (!checkWifi(MainActivity.this) && !checkMobile(MainActivity.this)) {
             Toast.makeText(getBaseContext(), "Necesaria conexión a internet ", Toast.LENGTH_SHORT).show();
             swipeContainer.setRefreshing(false);
+            MaterialDialog dialog = new MaterialDialog.Builder(this).
+                    title("Obrir configuració de de xarxa").
+                    positiveText("Wifi").
+                    neutralText("Dades mòbils").
+                    negativeText("Cancel·la").
+                    positiveColor(Color.parseColor("#2196F3")).
+                    neutralColor(Color.parseColor("#2196F3")).
+                    negativeColor(Color.parseColor("#ff3333")).
+                    onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            Intent intent = new Intent(Intent.ACTION_MAIN);
+                            intent.setClassName("com.android.settings", "com.android.settings.wifi.WifiSettings");
+                            startActivity(intent);
+                        }
+                    }).
+                    onNeutral(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            Intent intent = new Intent(Intent.ACTION_MAIN);
+                            intent.setClassName("com.android.phone", "com.android.phone.NetworkSetting");
+                            startActivity(intent);
+                        }
+                    }).
+                    build();
+            dialog.show();
         } else if (checkMobile(MainActivity.this)) {
-            Toast.makeText(getBaseContext(), "Connexió amb dades mòbils, desitges descarregar la llista ?", Toast.LENGTH_SHORT).show();
             MaterialDialog dialog = new MaterialDialog.Builder(this).
                     title("Connexió amb dades mòbils, desitges descarregar la llista ?").
                     negativeText("Cancel·la").
@@ -219,13 +244,10 @@ public class MainActivity extends AppCompatActivity
                             Ion.with(MainActivity.this)
                                     .load("http://acacha.github.io/json-server-todos/db_todos.json")
                                     .asJsonArray()
-                                            //Procés asíncron
                                     .setCallback(new FutureCallback<JsonArray>() {
                                         @Override
                                         public void onCompleted(Exception e, JsonArray result) {
-                                            //Guardem la resposta de la consulta
                                             todoList = result.toString();
-                                            //Actualitzem la llista
                                             updateTodosList();
                                             Toast toast = Toast.makeText(MainActivity.this, "Descarrega completada!!", Toast.LENGTH_SHORT);
                                             toast.show();
@@ -424,15 +446,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void removeTask(View view) {
-
-
         ListView lvItems = (ListView) findViewById(R.id.todolistview);
-
         for (int i = tasks.size() - 1; i >= 0; i--) {
             RelativeLayout vwParentRow = (RelativeLayout) lvItems.getChildAt(i);
-            CheckBox btnChild = (CheckBox) vwParentRow.getChildAt(2);
-
-            if (tasks.get(i).isDone() && btnChild.isChecked()) {
+            CheckBox btnChild = (CheckBox) vwParentRow.getChildAt(1);
+            if (btnChild.isChecked()) {
                 tasks.remove(i);
             }
         }
