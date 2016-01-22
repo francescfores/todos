@@ -74,31 +74,44 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                fetchDownloadJson();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         SharedPreferences todos = getSharedPreferences(SHARED_PREFERENCES_TODOS, 0);
         String todoList = todos.getString(TODO_LIST, null);
 
 
-        String initial_json = "[\n" +
-                "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 1},\n" +
-                "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 2},\n" +
-                "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
-                "        ]" ;
-
-        Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
-        this.gson = new Gson();
-        TodoArrayList temp = gson.fromJson(initial_json,arrayTodoList);
-        TestAsyncTask testAsyncTask = new TestAsyncTask(MainActivity.this, "http://tasksapi.app/task/10");
-        testAsyncTask.execute();
-        if (temp != null) {
-            tasks = temp;
-        } else {
-            //Error TODO
+        if (todoList == null) {
+            String initial_json = "[\n" +
+                    "         {\"name\":\"Comprar llet\", \"done\": true, \"priority\": 2},\n" +
+                    "         {\"name\":\"Comprar pa\", \"done\": true, \"priority\": 1},\n" +
+                    "         {\"name\":\"Fer exercici\", \"done\": false, \"priority\": 3},\n" +
+                    "         {\"name\":\"Estudiar\", \"done\": false, \"priority\": 3}\n" +
+                    "        ]" ;
+            SharedPreferences.Editor editor = todos.edit();
+            editor.putString(TODO_LIST,initial_json);
+            editor.commit();
+            todoList = todos.getString(TODO_LIST, null);
         }
 
-        ListView todoslv = (ListView) findViewById(R.id.todolistview);
-        adapter = new CustomListAdapter(this, tasks);
-        todoslv.setAdapter(adapter);
-        Utility.setListViewHeightBasedOnChildren(todoslv);
+
+        //TestAsyncTask testAsyncTask = new TestAsyncTask(MainActivity.this, "http://tasksapi.app/task/10");
+        //testAsyncTask.execute();
 
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -118,24 +131,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                fetchDownloadJson();
-            }
-        });
-        // Configure the refreshing colors
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
-
     }
 
     private void fetchDownloadJson() {
@@ -146,12 +141,30 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onCompleted(Exception e, JsonArray result) {
                         todoList = result.toString();
-                        updateTodoslv();
+                        updateTodosList();
                     }
                 });
     }
-    private void updateTodoslv() {
+    private void updateTodosList() {
+        Type arrayTodoList = new TypeToken<TodoArrayList>() {}.getType();
+        this.gson = new Gson();
+        TodoArrayList temp = gson.fromJson(todoList,arrayTodoList);
+
+        if (temp != null) {
+            tasks = temp;
+        } else {
+            //Error TODO
+        }
+
+        ListView todoslv =
+                (ListView) findViewById(R.id.todolistview);
+
+        //We bind our arraylist of tasks to the adapter
+        adapter = new CustomListAdapter(this, tasks);
+        todoslv.setAdapter(adapter);
+
         swipeContainer.setRefreshing(false);
+
     }
     @Override
     public void onBackPressed() {
