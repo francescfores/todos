@@ -51,6 +51,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity
 
     private String todoList = "";
     private Gson gson;
-    public TodoArrayList tasks;
+    public TodoArrayList tasks = new TodoArrayList();
     private CustomListAdapter adapter;
     private String taskName;
     private int taskPriority;
@@ -170,15 +171,17 @@ public class MainActivity extends AppCompatActivity
 
         if (temp != null) {
             tasks = temp;
+
+            ListView todoslv = (ListView) findViewById(R.id.todolistview);
+
+            //We bind our arraylist of tasks to the adapter
+            adapter = new CustomListAdapter(this, tasks);
+            todoslv.setAdapter(adapter);
         } else {
             //Error TODO
         }
 
-        ListView todoslv = (ListView) findViewById(R.id.todolistview);
 
-        //We bind our arraylist of tasks to the adapter
-        adapter = new CustomListAdapter(this, tasks);
-        todoslv.setAdapter(adapter);
     }
 
     private void PullToRefresh() {
@@ -373,8 +376,12 @@ public class MainActivity extends AppCompatActivity
                         todoItem.setDone(taskDone);
                         tasks.add(todoItem);
                         //tasks.remove(1);
-                        adapter.notifyDataSetChanged();
                         ListView todoslv = (ListView) findViewById(R.id.todolistview);
+
+                        //We bind our arraylist of tasks to the adapter
+                        adapter = new CustomListAdapter(MainActivity.this, tasks);
+                        todoslv.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
                         Utility.setListViewHeightBasedOnChildren(todoslv);
 
                     }

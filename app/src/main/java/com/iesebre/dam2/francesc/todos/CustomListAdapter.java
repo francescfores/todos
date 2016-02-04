@@ -1,11 +1,13 @@
 package com.iesebre.dam2.francesc.todos;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -63,6 +65,7 @@ public class CustomListAdapter extends BaseAdapter {
         return position;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
@@ -72,13 +75,13 @@ public class CustomListAdapter extends BaseAdapter {
 
         }
         TextView tv  = (TextView) convertView.findViewById(R.id.todolistitemtext);
-        tv.setText(list.get(position).getName()/* + " p: " + list.get(position).getPriority() + " done: " + list.get(position).isDone()*/);
+        tv.setText(list.get(position).getName() + " p: " + list.get(position).getPriority() + " done: " + list.get(position).isDone());
         CheckBox cBox  = (CheckBox) convertView.findViewById(R.id.task_remove);
 
         cBox.setVisibility(View.VISIBLE);
         cBox.setChecked(false);
 
-        tv.setTag(position);
+
 
         if(list.get(position).getPriority()==1){
             cBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#26A69A")));
@@ -93,10 +96,10 @@ public class CustomListAdapter extends BaseAdapter {
         if(list.get(position).isDone()){
             cBox.setChecked(true);
         }
+        RelativeLayout item = (RelativeLayout) convertView.findViewById(R.id.addtaskdialog);
+        tv.setTag(position);
 
-        RelativeLayout addtaskdialog = (RelativeLayout) convertView.findViewById(R.id.addtaskdialog);
-        addtaskdialog.setOnClickListener(new View.OnClickListener()
-        {
+        item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
 

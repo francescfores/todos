@@ -9,6 +9,9 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [manifestApplicationId: "${applicationId}",
+                                onesignal_app_id: "7dddd1e7-b755-4631-b8bd-7cb08155ff2f",
+                                onesignal_google_project_number: "675162100886"]
     }
     buildTypes {
         release {
@@ -35,4 +38,6 @@ dependencies {
     }
     compile 'com.koushikdutta.ion:ion:2.+'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+
+
 }
