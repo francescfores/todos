@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/addtaskdialog"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -27,14 +28,47 @@
         android:inputType="textCapSentences"
         android:maxLines="1"
         android:hint="Estat de la tasca"/>-->
+    <!--<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+        <!--<RadioButton android:id="@+id/radio1"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="1"-->
+            <!--android:onClick="onRadioButtonClicked"/>-->
+        <!--<RadioButton android:id="@+id/radio2"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="2"-->
+            <!--android:onClick="onRadioButtonClicked"/>-->
+        <!--<RadioButton android:id="@+id/radio3"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="2"-->
+            <!--android:onClick="onRadioButtonClicked"/>-->
+    <!--</RadioGroup>-->
     <CheckBox android:id="@+id/task_Done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Estat de la tasca"
         />
+    <!--<com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch-->
+        <!--android:id="@+id/pin"-->
+        <!--android:layout_width="130dp"-->
+        <!--android:layout_height="130dp"-->
+        <!--/>-->
 
-    <!--- Priority -->
-    <!--- Done -->
+    <!--<com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch-->
+        <!--android:id="@+id/pin2"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:base_release_color="@color/colorAccent"-->
+        <!--app:base_press_color="@color/md_deep_orange_50"-->
+        <!--app:ball_release_color="@color/md_white_1000"-->
+        <!--app:ball_press_color="@color/colorPrimaryDark"-->
+        <!--app:icon_release="@drawable/check"-->
+        <!--app:icon_press="@drawable/delete"/>-->
 
 </LinearLayout>
